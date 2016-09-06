@@ -13,10 +13,11 @@ local function tablelength(T)
 end
 
 function index(params)
-	f = "<strong>Hello World"
+	f = "Hello World"
 	if params["foo"] then
 		f = f.." "..params["foo"]
 	end
 	
-	return f .. "</strong>"
+	
+	return f
 end

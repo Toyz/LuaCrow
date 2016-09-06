@@ -1,8 +1,8 @@
-#include "crow\crow.h"
+#include "crow/crow.h"
 #include <string>
 #include "EdUrlParser.h"
 
-#include "lua\LuaBridge.h"
+#include "lua/LuaBridge.h"
 extern "C" {
 	# include "lua.h"
 	# include "lualib.h"
@@ -16,11 +16,10 @@ void print(std::string s) {
 	CROW_LOG_INFO << s;
 }
 
-void handler(std::string route, std::string funcName) {
+void handler(std::string route, luabridge::LuaRef funcName) {
 	std::string r = route;
 	app.route_dynamic(std::move(r))
 	([funcName] (const crow::request& req, crow::response& res) {
-		luabridge::LuaRef doFunc = luabridge::getGlobal(L, funcName.c_str());
 		luabridge::LuaRef v(L);
 		v = luabridge::newTable(L);
 
@@ -30,9 +29,10 @@ void handler(std::string route, std::string funcName) {
 		for (int i = 0; i<num; i++) {
 			v[kvs[i].key] = kvs[i].val;
 		}
+		
+		std::string data = funcName(v);
 
-		std::string data = doFunc(v);
-
+		res.set_header("Content-Type", "text/html");
 		res.write(data);
 		res.end();
 	});
@@ -47,17 +47,9 @@ int main() {
 		.addFunction("handle", handler)
 		.endNamespace();
 
-	/*luabridge::getGlobalNamespace(L).
-		beginClass<crow::query_string>("query_string")
-		.addConstructor <void(*) (const std::string&)>()
-		.addConstructor <void(*) (const  crow::query_string&)>()
-		.addFunction("get", &crow::query_string::get)
-		.addFunction("get_list", &crow::query_string::get_list)
-		.endClass();*/
-
 	luabridge::getGlobalNamespace(L).addFunction("log", print);
 
-	luaL_dofile(L, "test.lua");
+	luaL_dofile(L, "main.lua");
 
 	luabridge::LuaRef init = luabridge::getGlobal(L, "init");
 	init();

@@ -103,11 +103,11 @@ namespace crow
             }
         }
 
-        void end(const std::string& body_part)
+        /*void end(const std::string& body_part)
         {
             body += body_part;
             end();
-        }
+        }*/
 
         bool is_alive()
         {
