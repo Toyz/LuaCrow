@@ -1,5 +1,6 @@
 #include "crow/crow.h"
 #include <string>
+#include <memory>
 #include "EdUrlParser.h"
 
 #include "lua/LuaBridge.h"
@@ -17,9 +18,10 @@ void print(std::string s) {
 }
 
 void handler(std::string route, luabridge::LuaRef funcName) {
-	std::string r = route;
-	app.route_dynamic(std::move(r))
-	([funcName] (const crow::request& req, crow::response& res) {
+	app.route_dynamic(std::move(route))
+	([=] (const crow::request& req, crow::response& res) {
+		//crow::response r(std::move(res));
+
 		luabridge::LuaRef v(L);
 		v = luabridge::newTable(L);
 
