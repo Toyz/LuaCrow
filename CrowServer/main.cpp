@@ -11,6 +11,11 @@ extern "C" {
 
 crow::SimpleApp app;
 lua_State* L;
+
+void print(std::string s) {
+	CROW_LOG_INFO << s;
+}
+
 void handler(std::string route, std::string funcName) {
 	std::string r = route;
 	app.route_dynamic(std::move(r))
@@ -23,18 +28,14 @@ void handler(std::string route, std::string funcName) {
 		vector<query_kv_t> kvs;
 		int num = EdUrlParser::parseKeyValueList(&kvs, url->query);
 		for (int i = 0; i<num; i++) {
-			v[kvs[i].key.c_str()] = kvs[i].val.c_str();
+			v[kvs[i].key] = kvs[i].val;
 		}
 
-		std::string data = doFunc(v, req.raw_url);
+		std::string data = doFunc(v);
 
 		res.write(data);
 		res.end();
 	});
-}
-
-void print(std::string s) {
-	CROW_LOG_INFO << s;
 }
 
 int main() {
