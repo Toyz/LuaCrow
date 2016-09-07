@@ -13,10 +13,12 @@ local function tablelength(T)
 end
 
 function index(params)
+	set_cookie("test", "Test from lua")
 	f = "<strong>Hello World"
 	if params["foo"] then
 		f = f.." "..params["foo"]
 	end
 	
-	return f .. "</strong>"
+	f = f.."</strong>"
+	return f
 end

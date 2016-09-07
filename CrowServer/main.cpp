@@ -1,4 +1,5 @@
 #include "crow/crow.h"
+#include "crow/middleware.h"
 #include <string>
 #include <memory>
 #include "EdUrlParser.h"
@@ -10,7 +11,7 @@ extern "C" {
 	# include "lauxlib.h"
 }
 
-crow::SimpleApp app;
+crow::App<crow::CookieParser> app;
 lua_State* L;
 
 void print(std::string s) {
@@ -34,6 +35,8 @@ void handler(std::string route, luabridge::LuaRef funcName) {
 		
 		std::string data = funcName(v);
 
+		app.get_context<crow::CookieParser>(req).set_cookie("test", "test");
+		//ctx.set_cookie("test", "test");
 		res.set_header("Content-Type", "text/html");
 		res.write(data);
 		res.end();
